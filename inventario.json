@@ -1,0 +1,12 @@
+[
+    {
+        "nombre": "tuercas",
+        "precio": 15000.0,
+        "cantidad": 10
+    },
+    {
+        "nombre": "Masetas",
+        "precio": 230000.0,
+        "cantidad": 80
+    }
+]
