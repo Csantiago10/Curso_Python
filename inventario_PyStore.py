@@ -17,11 +17,29 @@ class Producto:
             return False  # No se puede vender más de lo que hay en stock
         self.cantidad += cantidad_cambio
         return True
-            
+    
 
+
+def guardar_datos():
+    with open("inventario.txt", "w") as archivo:
+        for item in inventario:
+            archivo.write(f"{item.nombre},{item.precio},{item.cantidad}\n")
+    print(f"\n{VERDE}Datos guardados exitosamente en inventario.txt{RESET}")
+
+def cargar_datos():
+    try:
+        with open("inventario.txt", "r") as archivo:
+            for linea in archivo:
+                nombre, precio, cantidad = linea.strip().split(",")
+                producto = Producto(nombre, float(precio), int(cantidad))
+                inventario.append(producto)
+            print(f"{VERDE}Datos cargados exitosamente desde inventario.txt{RESET}")
+    except FileNotFoundError:
+        print(f"{ROJO}Archivo inventario.txt no encontrado. Iniciando con inventario vacío.{RESET}")
 
 inventario = []
 
+cargar_datos()
 
 while True:
     print("\n" + "="*30)
@@ -96,6 +114,8 @@ while True:
         if not producto_encontrado:
             print(f"{ROJO}ERROR{RESET}: Producto no encontrado en el inventario.")       
     elif menu_principal == "4":
-        print("Saliendo del sistema de inventario. ¡Hasta luego!")
+        guardar_datos()
+
+        print("\nSaliendo del sistema de inventario. ¡Hasta luego!")
         break
 
