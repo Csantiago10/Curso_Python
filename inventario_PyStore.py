@@ -1,6 +1,9 @@
+import json
+
 # Códigos de colores ANSI
 VERDE = '\033[92m'
 ROJO = '\033[91m'
+BLUE = '\033[94m'
 RESET = '\033[0m'  # Este es importante para quitar el color
 
 class Producto:
@@ -22,20 +25,26 @@ class Producto:
 
 def guardar_datos():
     with open("inventario.txt", "w") as archivo:
+        lista_datos = []
         for item in inventario:
-            archivo.write(f"{item.nombre},{item.precio},{item.cantidad}\n")
-    print(f"\n{VERDE}Datos guardados exitosamente en inventario.txt{RESET}")
+            lista_datos.append({"nombre": item.nombre, "precio": item.precio, "cantidad": item.cantidad})
+    
+    with open("inventario.txt", "w") as archivo:
+        json.dump(lista_datos, archivo, indent=4)
+    print(f"\n{VERDE}Datos guardados exitosamente en JSON.{RESET}")
 
 def cargar_datos():
     try:
-        with open("inventario.txt", "r") as archivo:
-            for linea in archivo:
-                nombre, precio, cantidad = linea.strip().split(",")
-                producto = Producto(nombre, float(precio), int(cantidad))
-                inventario.append(producto)
-            print(f"{VERDE}Datos cargados exitosamente desde inventario.txt{RESET}")
+        with open("inventario.json", "r") as archivo:
+            lista_datos = json.load(archivo)
+            
+            for dato in lista_datos:
+                
+                prod = Producto(dato["nombre"], dato["precio"], dato["cantidad"])
+                inventario.append(prod)
+        print(f"{VERDE}Datos cargados exitosamente desde inventario.txt{RESET}")
     except FileNotFoundError:
-        print(f"{ROJO}Archivo inventario.txt no encontrado. Iniciando con inventario vacío.{RESET}")
+        print(f"{BLUE}Iniciando con inventario vacío.{RESET}")
 
 inventario = []
 
