@@ -1,5 +1,6 @@
 import json
 
+
 # ==========================================
 # CONFIGURACIÓN DE ESTILO (Colores ANSI)
 # ==========================================
@@ -7,6 +8,14 @@ VERDE = '\033[92m'
 ROJO = '\033[91m'
 BLUE = '\033[94m'
 RESET = '\033[0m'  # Restablece el color de la consola
+
+# ==========================================
+# FUNCIONES AUXILIARES
+# ==========================================
+def formato_pesos_colombianos(precio):
+    """Formatea un número como pesos colombianos: $1.234.567,89"""
+    texto = f"${precio:,.2f}"
+    return texto.replace(",", "_").replace(".", ",").replace("_", ".")
 
 # ==========================================
 # CLASES (Modelos de Datos)
@@ -20,8 +29,8 @@ class Producto:
         self.cantidad = cantidad
 
     def mostrar_info(self):
-        """Devuelve un string con formato legible para mostrar al usuario."""
-        return f"Producto: {self.nombre}, Precio: ${self.precio}, Cantidad: {self.cantidad}"
+        """Devuelve una tupla con los datos del producto para formato tabla."""
+        return (self.nombre, formato_pesos_colombianos(self.precio), self.cantidad)
     
     def actualizar_stock(self, cantidad_cambio):
         """
@@ -137,11 +146,15 @@ while True:
         if not inventario:
             print("El inventario está vacío.")
         else:
-            print("\n" + "="*30)
-            print("       INVENTARIO")
-            print("-"*30)
+            print("\n" + "="*60)
+            print("                            INVENTARIO")
+            print("="*60)
+            print(f"{'Producto':<20} | {'Precio':<12} | {'Cantidad':<10}")
+            print("-"*60)
             for item in inventario:
-                print(item.mostrar_info())
+                nombre, precio, cantidad = item.mostrar_info()
+                print(f"{nombre:<20} | {precio:<12} | {cantidad:<10}")
+            print("="*60)
 
     # --- OPCIÓN 3: ACTUALIZAR (Update) ---
     elif menu_principal == "3":
@@ -152,7 +165,11 @@ while True:
         for item in inventario:
             if item.nombre.lower() == nombre_buscar.lower():
                 producto_encontrado = item
-                print(f"Producto encontrado: {producto_encontrado.mostrar_info()}")
+                nombre, precio, cantidad = producto_encontrado.mostrar_info()
+                print(f"\nProducto encontrado:")
+                print(f"{'Nombre':<15}: {nombre}")
+                print(f"{'Precio':<15}: {precio}")
+                print(f"{'Cantidad':<15}: {cantidad}")
 
                 while True:
                     try:

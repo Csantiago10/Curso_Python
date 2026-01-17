@@ -1,8 +1,15 @@
-print("Tabla de multiplicar del 1 al 10")
+def tabla_multiplicacion(numero):
+    for i in range(1, 11):
+        resultado = numero * i
+        print(f"{numero} x {i} = {resultado}")
 
-tabla_multiplicar = int(input(f"Ingrese el número de la tabla de multiplicar: "))
 
-print(f"Tabla de multiplicar del {tabla_multiplicar}\n")
-for i in range(1, 11):
-    print(f"{tabla_multiplicar} x {i} = {tabla_multiplicar * i}")
-    
+
+
+numero = int(input("Ingrese el número de la tabla de multiplicar: "))
+print("\n" + "="*30)
+print(f"Tabla de multiplicar del {numero}")
+print("="*30)
+
+
+tabla_multiplicacion(numero)
