@@ -95,6 +95,23 @@ def actualizar_stock(libro: Libro, nueva_cantidad: int) -> bool:
         return True
     else:
         return False
+    
+def buscar_libro_unico(nombre: str, editorial: str) -> Libro | None:
+    """
+    Busca un libro específico coincidiendo Nombre Y Editorial.
+    Es necesario para eliminar o modificar sin errores.
+    """
+    nombre_busqueda = nombre.lower().strip()
+    editorial_busqueda = editorial.lower().strip()
+
+    for libro in biblioteca:
+        # Verificamos las DOS condiciones
+        if (libro.nombre.lower().strip() == nombre_busqueda and 
+            libro.editorial.lower().strip() == editorial_busqueda):
+            return libro # ¡Encontrado el exacto!
+            
+    return None # No existe esa combinación
+
 # ==============================
 # PERSISTENCIA
 # ==============================
@@ -122,11 +139,30 @@ def cargar_biblioteca() -> list[Libro]:
 # ==============================
 def obtener_datos_libro() -> tuple:
     print(f"\n{BLUE}--- Nuevo Libro ---{RESET}")
-    nombre = input("Nombre: ").strip()
-    categoria = input("Categoría: ").strip()
-    autor = input("Autor: ").strip()
-    editorial = input("Editorial: ").strip()
-    
+    while True:
+        nombre = input("Nombre: ").strip()
+        if nombre:
+            break
+        print("El nombre no puede estar vacío.")
+
+    while True:        
+        categoria = input("Categoría: ").strip()
+        if categoria:
+            break
+        print("La categoría no puede estar vacía.")
+
+    while True:
+        autor = input("Autor: ").strip()
+        if autor:
+            break
+        print("El autor no puede estar vacío.")
+
+    while True:
+        editorial = input("Editorial: ").strip()
+        if editorial:
+            break
+        print("La editorial no puede estar vacía.")
+
     while True:
         try:
             paginas = int(input("Páginas: "))
@@ -221,23 +257,32 @@ def ejecutar_opcion(opcion: str) -> bool:
         else:
             print(f"{RED}Libro no encontrado.{RESET}")
 
-    # ### NUEVO: ELIMINAR LIBRO ###
+    # --- OPCIÓN 5: ELIMINAR LIBRO (CORREGIDO) ---
     elif opcion == "5":
-        nombre_buscar = input("Ingrese el nombre del libro a eliminar: ")
-        libro_encontrado = buscar_libro_exacto(nombre_buscar)
+        print(f"\n{RED}--- Eliminar Libro ---{RESET}")
+        print("Para eliminar, necesitamos identificar el libro exacto.")
+        
+        nombre_buscar = input("Ingrese el nombre del libro: ")
+        editorial_buscar = input("Ingrese la editorial del libro: ") # <--- Nuevo Input
+        
+        # Usamos la nueva función precisa
+        libro_encontrado = buscar_libro_unico(nombre_buscar, editorial_buscar)
         
         if libro_encontrado:
             print(f"\n{RED}¡ADVERTENCIA! Va a eliminar:{RESET}")
-            print(f"- {libro_encontrado.nombre} (Editorial: {libro_encontrado.editorial})")
-            confirmar = input("¿Está seguro? (si/no): ").lower()
+            print(f"- Título: {libro_encontrado.nombre}")
+            print(f"- Editorial: {libro_encontrado.editorial}")
+            print(f"- Stock actual: {libro_encontrado.cantidad}")
+            
+            confirmar = input("¿Está seguro de borrarlo permanentemente? (si/no): ").lower()
             
             if confirmar == "si":
-                biblioteca.remove(libro_encontrado) # Adiós libro
-                print(f"{GREEN}Libro eliminado.{RESET}")
+                biblioteca.remove(libro_encontrado)
+                print(f"{GREEN}Libro eliminado exitosamente.{RESET}")
             else:
                 print(f"{BLUE}Operación cancelada.{RESET}")
         else:
-            print(f"{RED}Libro no encontrado.{RESET}")
+            print(f"{RED}Error: No se encontró un libro con ese Nombre y esa Editorial.{RESET}")
 
     elif opcion == "6":
         sanitizar_biblioteca()
