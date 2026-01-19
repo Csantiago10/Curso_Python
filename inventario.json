@@ -1,17 +1,7 @@
 [
     {
-        "nombre": "tuercas",
-        "precio": 15000.0,
-        "cantidad": 10
-    },
-    {
         "nombre": "Masetas",
         "precio": 230000.0,
-        "cantidad": 80
-    },
-    {
-        "nombre": "Masetas",
-        "precio": 150000.0,
-        "cantidad": 10
+        "cantidad": 120
     }
 ]
