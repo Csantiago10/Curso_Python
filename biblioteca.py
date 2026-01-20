@@ -1,4 +1,5 @@
 import json
+import uuid
 
 # ==============================
 # CONFIGURACIÓN Y CONSTANTES
@@ -13,16 +14,21 @@ ARCHIVO_DB = "biblioteca.json"
 # CLASE LIBRO
 # ==============================
 class Libro:
-    def __init__(self, nombre: str, categoria: str, autor: str, editorial: str, paginas: int, cantidad: int):
+    def __init__(self, nombre: str, categoria: str, autor: str, editorial: str, paginas: int, cantidad: int, id: str = None):
+        
+        #Si me pasan un id, lo uso; si no, genero uno nuevo
+        self.id = id if id else str(uuid.uuid4())
+
         self.nombre = nombre
         self.categoria = categoria
         self.autor = autor
         self.editorial = editorial
         self.paginas = paginas
+        self.id = id if id is not None else str(uuid.uuid4())
         self.cantidad = cantidad
 
     def mostrar_info(self):
-        return (self.nombre, self.autor, self.editorial, self.categoria, self.paginas, self.cantidad)
+        return (self.nombre, self.autor, self.editorial, self.categoria, self.paginas, self.cantidad, self.id)
 
 # ==============================
 # VARIABLES GLOBALES
