@@ -1,3 +1,4 @@
+import re
 import uuid
 # Importamos el motor SQL
 from sqlalchemy import create_engine, Column, String, Integer, func 
@@ -30,6 +31,12 @@ class Libro(Base):
         self.paginas = paginas
         self.cantidad = cantidad
 
+    #Propiedad para el Frontend (CSS)
+    @property
+    def clase_css_stock(self):
+        return "stock-bajo" if self.cantidad < 5 else "stock-alto"
+        
+
 # 3. Encender el motor
 # echo=False para que no nos llene la pantalla de texto técnico
 motor = create_engine('sqlite:///biblioteca_produccion.sqlite', echo=False) 
@@ -50,8 +57,8 @@ RED, GREEN, BLUE, RESET = "\033[91m", "\033[92m", "\033[94m", "\033[0m"
 
 def buscar_libro_unico(nombre: str, editorial: str):
     """
-    Busca en la BD usando filtros SQL (WHERE).
-    Equivale a: SELECT * FROM libros WHERE nombre=... AND editorial=...
+    Busca en la BD ignorando mayúsculas/minúsculas y espacios extra.
+    Devuelve el objeto Libro o None si no lo encuentra.
     """
     nombre_usuario = nombre.strip().lower()
     editorial_usuario = editorial.strip().lower()
@@ -64,11 +71,11 @@ def buscar_libro_unico(nombre: str, editorial: str):
 
 def registrar_libro_sql():
     print(f"\n{BLUE}--- Nuevo Registro SQL ---{RESET}")
-    # Usamos tus validaciones de siempre (Input)
+    # 1. Pedimos Nombre y Editorial primero
     nombre = input("Nombre: ").strip()
     editorial = input("Editorial: ").strip()
 
-    # VERIFICACIÓN EN TIEMPO REAL (Adiós Sanitizar masivo)
+    # 2. VERIFICACIÓN EN TIEMPO REAL
     # Antes de pedir más datos, miramos si ya existe en la BD
     existe = buscar_libro_unico(nombre, editorial)
     
@@ -77,12 +84,20 @@ def registrar_libro_sql():
         print(f"Stock actual: {existe.cantidad}")
         sumar = input("¿Desea sumar stock? (si/no): ").lower()
         if sumar == "si":
-            cant = int(input("Cantidad a sumar: "))
-            existe.cantidad += cant # SQL Alchemy detecta el cambio
-            session.commit() # ¡GUARDADO!
-            print(f"{GREEN}Stock actualizado.{RESET}")
-        return # Salimos de la función
-
+            while True:
+                try:
+                    cant = int(input("Cantidad a sumar: "))
+                    if cant > 0:
+                        existe.cantidad += cant # SQL Alchemy detecta el cambio
+                        session.commit() # ¡GUARDADO!
+                        print(f"{GREEN}Stock actualizado.{RESET}")
+                        break
+                    print("Deber ser mayor a 0.")
+                    
+                except ValueError:
+                    print(f"{RED}Error: Ingrese un número entero.{RESET}")
+        return
+            
     # Si no existe, pedimos el resto
     categoria = input("Categoría: ").strip()
     autor = input("Autor: ").strip()
@@ -93,7 +108,7 @@ def registrar_libro_sql():
         try:
             paginas = int(input("Páginas: "))
             if paginas > 0: break
-            print(f"{RED}Debe ser un número positivo.{RESET}")
+            print(f"{RED}Debe ser mayor a 0.{RESET}")
         except ValueError:
             print(f"{RED}Error: Ingrese un número entero.{RESET}")
 
@@ -102,7 +117,7 @@ def registrar_libro_sql():
         try:
             cantidad = int(input("Cantidad inicial: "))
             if cantidad >= 0: break
-            print(f"{RED}No puede ser negativo.{RESET}")
+            print(f"{RED}Debe ser mayor a 0.{RESET}")
         except ValueError:
             print(f"{RED}Error: Ingrese un número entero.{RESET}")
     
@@ -111,10 +126,14 @@ def registrar_libro_sql():
     # ...
 
     # CREAR (Insert)
-    nuevo_libro = Libro(nombre, categoria, autor, editorial, paginas, cantidad)
-    session.add(nuevo_libro)
-    session.commit() # ¡GUARDADO PERMANENTE!
-    print(f"{GREEN}Libro guardado en SQLite con ID: {nuevo_libro.id}{RESET}")
+    try:
+        nuevo_libro = Libro(nombre, categoria, autor, editorial, paginas, cantidad)
+        session.add(nuevo_libro)
+        session.commit() # ¡GUARDADO PERMANENTE!
+        print(f"{GREEN}Libro guardado en SQLite con ID: {nuevo_libro.id}{RESET}")
+    except Exception as e:
+        session.rollback() # En caso de error, revertir cambios
+        print(f"{RED}Error al guardar el libro: {e}{RESET}")
 
 def ver_catalogo_sql():
     # LEER (Select All)
