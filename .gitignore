@@ -1,4 +1,15 @@
+# Ignorar carpeta de entorno virtual (MUY IMPORTANTE)
 .venv/
+venv/
+
+# Ignorar archivos compilados de Python (Basura)
+__pycache__/
+*.pyc
+
+# Ignorar base de datos vieja (JSON)
 inventario.json
 biblioteca.json
-__pycache__/
+
+# OJO: NO IGNORES EL .sqlite
+# Normalmente las bases de datos no se suben, pero como quieres
+# mostrarle a tu amigo los libros que ya creaste, ¡déjala pasar por hoy!
